@@ -2,12 +2,6 @@ package esepunittests
 
 import "math"
 
-type GradeCalculator struct {
-	assignments []Grade
-	exams       []Grade
-	essays      []Grade
-}
-
 type GradeType int
 
 const (
@@ -22,9 +16,7 @@ var gradeTypeName = map[GradeType]string{
 	Essay:      "essay",
 }
 
-func (gt GradeType) String() string {
-	return gradeTypeName[gt]
-}
+func (gt GradeType) String() string { return gradeTypeName[gt] }
 
 type Grade struct {
 	Name  string
@@ -32,28 +24,53 @@ type Grade struct {
 	Type  GradeType
 }
 
+type outputMode int
+
+const (
+	modeLetter outputMode = iota
+	modePassFail
+)
+
+type entry struct {
+	name  string
+	grade int
+	kind  GradeType
+}
+
+type GradeCalculator struct {
+	mode  outputMode
+	items []entry
+}
+
 func NewGradeCalculator() *GradeCalculator {
-	return &GradeCalculator{
-		assignments: make([]Grade, 0),
-		exams:       make([]Grade, 0),
-		essays:      make([]Grade, 0),
-	}
+	return &GradeCalculator{mode: modeLetter, items: make([]entry, 0)}
+}
+
+func NewGradeCalculatorPassFail() *GradeCalculator {
+	return &GradeCalculator{mode: modePassFail, items: make([]entry, 0)}
 }
 
 func (gc *GradeCalculator) GetFinalGrade() string {
-	numericalGrade := gc.calculateNumericalGrade()
-
-	switch {
-	case numericalGrade >= 90:
-		return "A"
-	case numericalGrade >= 80:
-		return "B"
-	case numericalGrade >= 70:
-		return "C"
-	case numericalGrade >= 60:
-		return "D"
+	n := gc.calculateNumericalGrade()
+	switch gc.mode {
+	case modePassFail:
+		if n >= 70 {
+			return "Pass"
+		}
+		return "Fail"
 	default:
-		return "F"
+		switch {
+		case n >= 90:
+			return "A"
+		case n >= 80:
+			return "B"
+		case n >= 70:
+			return "C"
+		case n >= 60:
+			return "D"
+		default:
+			return "F"
+		}
 	}
 }
 
@@ -64,34 +81,28 @@ func (gc *GradeCalculator) AddGrade(name string, grade int, gradeType GradeType)
 	if grade > 100 {
 		grade = 100
 	}
-
-	switch gradeType {
-	case Assignment:
-		gc.assignments = append(gc.assignments, Grade{Name: name, Grade: grade, Type: Assignment})
-	case Exam:
-		gc.exams = append(gc.exams, Grade{Name: name, Grade: grade, Type: Exam})
-	case Essay:
-		gc.essays = append(gc.essays, Grade{Name: name, Grade: grade, Type: Essay})
-	}
+	gc.items = append(gc.items, entry{name: name, grade: grade, kind: gradeType})
 }
 
 func (gc *GradeCalculator) calculateNumericalGrade() int {
-	assignmentAvg := computeAverage(gc.assignments)
-	examAvg := computeAverage(gc.exams)
-	essayAvg := computeAverage(gc.essays)
-
-	weighted := assignmentAvg*0.50 + examAvg*0.35 + essayAvg*0.15
-	return int(math.Round(weighted))
+	a := avgKind(gc.items, Assignment)
+	e := avgKind(gc.items, Exam)
+	s := avgKind(gc.items, Essay)
+	w := a*0.50 + e*0.35 + s*0.15
+	return int(math.Round(w))
 }
 
-// computeAverage safely handles empty slices.
-func computeAverage(grades []Grade) float64 {
-	if len(grades) == 0 {
+func avgKind(es []entry, kind GradeType) float64 {
+	count := 0
+	sum := 0
+	for _, it := range es {
+		if it.kind == kind {
+			sum += it.grade
+			count++
+		}
+	}
+	if count == 0 {
 		return 0
 	}
-	sum := 0
-	for _, g := range grades { 
-		sum += g.Grade
-	}
-	return float64(sum) / float64(len(grades))
+	return float64(sum) / float64(count)
 }
