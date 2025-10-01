@@ -3,30 +3,11 @@ package esepunittests
 import "testing"
 
 func TestGetGradeA(t *testing.T) {
-	expected_value := "A"
-
-	gradeCalculator := NewGradeCalculator()
-	gradeCalculator.AddGrade("open source assignment", 100, Assignment)
-	gradeCalculator.AddGrade("exam 1", 100, Exam)
-	gradeCalculator.AddGrade("essay on ai ethics", 100, Essay)
-
-	actual_value := gradeCalculator.GetFinalGrade()
-
-	if expected_value != actual_value {
-		t.Errorf("Expected GetGrade to return '%s'; got '%s' instead", expected_value, actual_value)
-	}
-}
-package esepunittests
-
-import "testing"
-
-func TestGetGradeA(t *testing.T) {
 	expected := "A"
 	gc := NewGradeCalculator()
 	gc.AddGrade("open source assignment", 100, Assignment)
 	gc.AddGrade("exam 1", 100, Exam)
 	gc.AddGrade("essay on ai ethics", 100, Essay)
-
 	if got := gc.GetFinalGrade(); got != expected {
 		t.Fatalf("want %s, got %s", expected, got)
 	}
@@ -38,7 +19,6 @@ func TestGetGradeB(t *testing.T) {
 	gc.AddGrade("assignment", 80, Assignment)
 	gc.AddGrade("exam 1", 81, Exam)
 	gc.AddGrade("essay", 85, Essay)
-
 	if got := gc.GetFinalGrade(); got != expected {
 		t.Fatalf("want %s, got %s", expected, got)
 	}
@@ -50,7 +30,6 @@ func TestGetGradeF(t *testing.T) {
 	gc.AddGrade("assignment", 100, Assignment)
 	gc.AddGrade("exam 1", 95, Exam)
 	gc.AddGrade("essay", 91, Essay)
-
 	if got := gc.GetFinalGrade(); got != expected {
 		t.Fatalf("want %s, got %s", expected, got)
 	}
@@ -106,7 +85,6 @@ func TestRoundingBoundaries(t *testing.T) {
 		{89, 90, 90, "A"},
 		{59, 59, 60, "F"},
 	}
-
 	for _, tt := range tests {
 		gc := NewGradeCalculator()
 		gc.AddGrade("a1", tt.assign, Assignment)
@@ -115,40 +93,9 @@ func TestRoundingBoundaries(t *testing.T) {
 		gc.AddGrade("e2", tt.exam, Exam)
 		gc.AddGrade("s1", tt.essay, Essay)
 		gc.AddGrade("s2", tt.essay, Essay)
-
 		if got := gc.GetFinalGrade(); got != tt.want {
 			t.Fatalf("want %s, got %s", tt.want, got)
 		}
-	}
-}
-
-func TestGetGradeB(t *testing.T) {
-	expected_value := "B"
-
-	gradeCalculator := NewGradeCalculator()
-	gradeCalculator.AddGrade("open source assignment", 80, Assignment)
-	gradeCalculator.AddGrade("exam 1", 81, Exam)
-	gradeCalculator.AddGrade("essay on ai ethics", 85, Essay)
-
-	actual_value := gradeCalculator.GetFinalGrade()
-
-	if expected_value != actual_value {
-		t.Errorf("Expected GetGrade to return '%s'; got '%s' instead", expected_value, actual_value)
-	}
-}
-
-func TestGetGradeF(t *testing.T) {
-	expected_value := "A"
-
-	gradeCalculator := NewGradeCalculator()
-	gradeCalculator.AddGrade("open source assignment", 100, Assignment)
-	gradeCalculator.AddGrade("exam 1", 95, Exam)
-	gradeCalculator.AddGrade("essay on ai ethics", 91, Essay)
-
-	actual_value := gradeCalculator.GetFinalGrade()
-
-	if expected_value != actual_value {
-		t.Errorf("Expected GetGrade to return '%s'; got '%s' instead", expected_value, actual_value)
 	}
 }
 
@@ -184,4 +131,3 @@ func TestPassFailBoundaryRounding(t *testing.T) {
 		t.Fatalf("want Pass at boundary, got %s", got)
 	}
 }
-
