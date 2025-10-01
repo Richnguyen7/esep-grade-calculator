@@ -151,3 +151,37 @@ func TestGetGradeF(t *testing.T) {
 		t.Errorf("Expected GetGrade to return '%s'; got '%s' instead", expected_value, actual_value)
 	}
 }
+
+func TestPassFailPass(t *testing.T) {
+	gc := NewGradeCalculatorPassFail()
+	gc.AddGrade("a1", 90, Assignment)
+	gc.AddGrade("e1", 85, Exam)
+	gc.AddGrade("s1", 80, Essay)
+	if got := gc.GetFinalGrade(); got != "Pass" {
+		t.Fatalf("want Pass, got %s", got)
+	}
+}
+
+func TestPassFailFail(t *testing.T) {
+	gc := NewGradeCalculatorPassFail()
+	gc.AddGrade("a1", 50, Assignment)
+	gc.AddGrade("e1", 55, Exam)
+	gc.AddGrade("s1", 58, Essay)
+	if got := gc.GetFinalGrade(); got != "Fail" {
+		t.Fatalf("want Fail, got %s", got)
+	}
+}
+
+func TestPassFailBoundaryRounding(t *testing.T) {
+	gc := NewGradeCalculatorPassFail()
+	gc.AddGrade("a1", 69, Assignment)
+	gc.AddGrade("a2", 69, Assignment)
+	gc.AddGrade("e1", 70, Exam)
+	gc.AddGrade("e2", 70, Exam)
+	gc.AddGrade("s1", 70, Essay)
+	gc.AddGrade("s2", 70, Essay)
+	if got := gc.GetFinalGrade(); got != "Pass" {
+		t.Fatalf("want Pass at boundary, got %s", got)
+	}
+}
+
